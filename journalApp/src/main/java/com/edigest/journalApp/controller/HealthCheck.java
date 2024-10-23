@@ -3,10 +3,8 @@ package com.edigest.journalApp.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-//check the server is running or not
 @RestController
 public class HealthCheck {
-
     @GetMapping("/health-check")
     public String healthCheck() {
         return "ok";

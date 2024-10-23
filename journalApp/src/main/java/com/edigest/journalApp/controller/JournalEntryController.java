@@ -16,7 +16,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/journal")
 public class JournalEntryController {
-
     //Dependency Injection (Field Injection)
     @Autowired
     private JournalEntryService journalEntryService;
@@ -29,7 +28,7 @@ public class JournalEntryController {
     public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String username) {
         User user = userService.findByUserName(username);
         List<JournalEntry> all = user.getJournalEntries();
-        if(all != null && !all.isEmpty()){
+        if(all != null & !all.isEmpty()) {
             return new ResponseEntity<>(all, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -37,7 +36,7 @@ public class JournalEntryController {
 
     //add new entry
     @PostMapping("/{username}")
-    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry, @PathVariable String username){
+    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry myEntry, @PathVariable String username) {
         //set date automatically (current date and time)
         try {
             journalEntryService.saveEntry(myEntry, username);
@@ -48,44 +47,42 @@ public class JournalEntryController {
     }
 
     //get single entry by id
-    @GetMapping("/id/{myId}")
+    @GetMapping("id/{myid}")
     public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId myId) {
         //if data is there then return data if data not found the return null
         Optional<JournalEntry> journalEntry = journalEntryService.getEntryById(myId);
 
-        if(journalEntry.isPresent()){
+        if(journalEntry.isPresent()) {
             return new ResponseEntity<>(journalEntry.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    //delete specified entry
     @DeleteMapping("/id/{username}/{myId}")
     public ResponseEntity<?> deleteJournalEntryById(@PathVariable ObjectId myId, @PathVariable String username) {
         Optional<JournalEntry> journalEntry = journalEntryService.getEntryById(myId);
-        if(journalEntry.isPresent()){
+
+        if(journalEntry.isPresent()) {
             journalEntryService.deleteById(myId, username);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //update specified entry
-    @PutMapping("/id/{username}/{id}")
-    public ResponseEntity<JournalEntry> updateJournalById(@PathVariable ObjectId id, @RequestBody JournalEntry newEntry, @PathVariable String username) {
-
+    @PutMapping("id/{username}/{id}")
+    public  ResponseEntity<JournalEntry> updateJournalById(@PathVariable ObjectId id, @RequestBody JournalEntry newEntry, @PathVariable String username) {
         //get old entry (existing)
         JournalEntry oldEntry = journalEntryService.getEntryById(id).orElse(null);
 
         if(oldEntry != null) {
             oldEntry.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().equals("") ? newEntry.getTitle() : oldEntry.getTitle());
+
             oldEntry.setContent(newEntry.getContent() != null && !newEntry.getContent().equals("") ? newEntry.getContent() : oldEntry.getContent());
+
             journalEntryService.saveEntry(oldEntry);
             return new ResponseEntity<>(oldEntry, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
-
-//Controller --> Service --> Repository

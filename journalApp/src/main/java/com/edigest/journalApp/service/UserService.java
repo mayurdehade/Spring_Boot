@@ -1,18 +1,15 @@
 package com.edigest.journalApp.service;
 
-import com.edigest.journalApp.entity.JournalEntry;
 import com.edigest.journalApp.entity.User;
-import com.edigest.journalApp.repository.JournalEntryRepository;
 import com.edigest.journalApp.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -22,7 +19,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 

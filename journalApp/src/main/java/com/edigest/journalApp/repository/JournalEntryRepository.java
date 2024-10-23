@@ -1,11 +1,10 @@
 package com.edigest.journalApp.repository;
 
 import com.edigest.journalApp.entity.JournalEntry;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
-import org.bson.types.ObjectId; //datatype
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-//we only extend the class name as MongoRepository<Entity, IdDataType>
+@Repository
 public interface JournalEntryRepository extends MongoRepository<JournalEntry, ObjectId> {
 }
