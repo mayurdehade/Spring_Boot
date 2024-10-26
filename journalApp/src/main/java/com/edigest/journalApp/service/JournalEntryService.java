@@ -6,6 +6,7 @@ import com.edigest.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +25,7 @@ public class JournalEntryService {
     //Make it transaction if any operation fails then it roll back the other saved data
     //achieve automaticity and isolation
     //transaction control
-    //@Transactional
+    @Transactional
     public void saveEntry(JournalEntry journalEntry, String username) {
         try {
             //user predefine method from MongoRepository
