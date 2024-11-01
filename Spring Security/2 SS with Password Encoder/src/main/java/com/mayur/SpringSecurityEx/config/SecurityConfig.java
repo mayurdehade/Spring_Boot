@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,11 +42,16 @@ public class SecurityConfig {
     //change authentication provider (own custom authentication provider)
     @Bean
     public AuthenticationProvider authenticationProvider() {
+        
         //return object of Authentication Provider (AuthenticationProvider is a Interface)
         //DaoAuthenticationProvider implementing Authentication provider indirectly
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        //DapAuthenticationProvider ask two things passwordEncoder and UserDetailsService (username, pass, roles and other information)
-        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        //DaoAuthenticationProvider ask two things passwordEncoder and UserDetailsService (username, pass, roles and other information)
+
+        //verify password
+        //BCrypt password
+//        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
 
         //for set own UserDetailsService we have to implement it beacuse it's interface then create our own class which implement UserDetailsService
         provider.setUserDetailsService(userDetailsService);
@@ -53,7 +59,10 @@ public class SecurityConfig {
         return provider;
     }
 
-
+    //plain -> hash1 -> hash2
+    //from plain text we get hash but from hash we can't get plain text
+    //bcrypt for user register to store it in database
+    //bcrypt for login password verification
 
 
 
