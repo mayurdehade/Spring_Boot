@@ -1,71 +1,63 @@
-package com.mayur.SpringSecurityEx.config;
-
+package com.jwt.SpringSecurityJWT.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
+    private JwtFilter jwtFilter;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        //in single line
-         return http
-                .csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("register", "login", "/")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                 .build();
+                //adding this filter before
+                //1. jwt filter for check token if token is not there then 2. username password authentication filter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
-
-    //custom users using database
-    //change authentication provider (own custom authentication provider)
     @Bean
     public AuthenticationProvider authenticationProvider() {
-
-        //return object of Authentication Provider (AuthenticationProvider is a Interface)
-        //DaoAuthenticationProvider implementing Authentication provider indirectly
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        //DaoAuthenticationProvider ask two things passwordEncoder and UserDetailsService (username, pass, roles and other information)
-
-        //verify password
-        //BCrypt password
-//        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-
-        //for set own UserDetailsService we have to implement it beacuse it's interface then create our own class which implement UserDetailsService
         provider.setUserDetailsService(userDetailsService);
-
         return provider;
     }
 
-    //plain -> hash1 -> hash2
-    //from plain text we get hash but from hash we can't get plain text
-    //bcrypt for user register to store it in database
-    //bcrypt for login password verification
 
+    //create bean for authentication manager (responsible for login)
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        //get authentication manager
+        return config.getAuthenticationManager();
 
-
-
+        //Authentication Manager talk to Authentication Provider
+    }
 
 }
